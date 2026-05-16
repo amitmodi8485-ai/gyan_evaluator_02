@@ -10,7 +10,7 @@ import os
 # -----------------------------------------------------
 # ૧. પેજ સેટિંગ
 # -----------------------------------------------------
-st.set_page_config(page_title="Gyan Academy - TAT Mains Evaluation", page_icon="🎓", layout="centered")
+st.set_page_config(page_title="Gyan Live - TAT Mains Evaluation", page_icon="🎓", layout="centered")
 
 # -----------------------------------------------------
 # ૨. API Key અને મોડેલ
@@ -61,7 +61,7 @@ def get_base64_image(image_path):
             return base64.b64encode(img_file.read()).decode()
     return ""
 
-# UPDATED: ગિટહબ રેપોમાં રહેલી તમારી સાચી ફાઇલનું નામ "gyan logo.jpg" અહીં સેટ કર્યું છે
+# ગિટહબ રેપોમાંથી લોગો લોડ કરવાનો પ્રયાસ
 logo_base64 = get_base64_image("gyan logo.jpg")
 
 # -----------------------------------------------------
@@ -147,7 +147,7 @@ def create_html_report(text):
     <html>
     <head>
         <meta charset="utf-8">
-        <title>Gyan Academy Result</title>
+        <title>Gyan Live Result</title>
         <style>
             body {{ font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; color: #111; background-color: #fff; }}
             h2 {{ color: #4f8ef7; text-align: center; border-bottom: 2px solid #4f8ef7; padding-bottom: 10px; margin-bottom: 20px; }}
@@ -155,7 +155,7 @@ def create_html_report(text):
         </style>
     </head>
     <body>
-        <h2>Gyan Academy - TAT Mains Result</h2>
+        <h2>Gyan Live - TAT Mains Result</h2>
         <div class="content">{text}</div>
     </body>
     </html>
@@ -168,7 +168,7 @@ def create_html_report(text):
 try: st.image("Seminar Uma Academy.jpg", use_container_width=True)
 except: pass
 
-# UPDATED: JPEG ઇમેજ ડેટા સપોર્ટ સાથે લોગો સ્ક્રીન પર દેખાશે
+# બ્રાન્ડિંગ લોગો
 if logo_base64:
     st.markdown(f"""
     <div class="logo-container">
@@ -204,7 +204,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                     ✅ **ખાસ સૂચના (સંપૂર્ણ પેપર માટે):** વિદ્યાર્થીએ આખું 100 માર્કનું પેપર અપલોડ કર્યું છે. દરેક પ્રશ્નનું અલગ-અલગ મૂલ્યાંકન નીચે મુજબના કડક માપદંદોથી કરવું:
                     ૧. નિબંધ (૨૦ ગુણ): આશરે ૨૫૦ થી ૩૦૦ શબ્દો. મહત્તમ ૧૪ ગુણ. હકારાત્મક: પ્રસ્તાવના(૪), વિષયવસ્તુ(૮), મૌલિકતા(૪), ભાષા(૪). નકારાત્મક: વિષયાંતર(-૩ થી -૫), શબ્દમર્યાદા ભંગ(-૧ થી -૨).
                     ૨. સંક્ષેપીકરણ (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): ૧/૩ ભાગ. પ્રત્યેકમાં મહત્તમ ૫ ગુણ. હકારાત્મક: શીર્ષક(૨), મૂળ વિચાર(૩), મૌલિકતા(૩), લંબાઈ(૨). નકારાત્મક: શીર્ષક વગર(-૨), કોપી-પેસ્ટ(-૩).
-                    ૩. પત્ર લેખન (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૧૦0 શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૩), સચોટતા(૪), સત્તાવાર ભાષા(૩). નકારાત્મક: માળખાકીય ભૂલ(-૧), અસ્પષ્ટતા(-૨).
+                    ૩. પત્ર લેખન (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૧૦૦ શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૩), સચોટતા(૪), સત્તાવાર ભાષા(૩). નકારાત્મક: માળખાકીય ભૂલ(-૧), અસ્પષ્ટતા(-૨).
                     ૪. ચર્ચાપત્ર (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૨૦0 શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૨), તટસ્થ રજૂઆત(૩), સૂચનો(૩), ભાષા(૨). નકારાત્મક: ફોર્મેટ ભૂલ(-૧ પ્રતિ ભૂલ).
                     ૫. વ્યાકરણ (૨૦ પ્રશ્નો, ૨૦ ગુણ): ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે. દરેક સાચા જવાબનો ૧ ગુણ, સહેજ પણ ભૂલ હોય તો સીધો ૦ ગુણ.
                     """
@@ -219,7 +219,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                 elif category == "ચર્ચાપત્ર":
                     total_marks = 10
                     max_marks_allowed = 6
-                    expected_words = "આશરે ૨૦0 શબ્દો"
+                    expected_words = "આશરે ૨૦૦ શબ્દો"
                     category_rules = """
                     ✅ હકારાત્મક ગુણ: ફોર્મેટ (કાલ્પનિક સરનામું, તંત્રીશ્રી, વિષય, સંબોધન) (૨ ગુણ), તટસ્થ રજૂઆત (૩ ગુણ), રચનાત્મક સૂચનો (૩ ગુણ), ઔપચારિક ભાષા (૨ ગુણ).
                     ❌ નકારાત્મક ગુણ: ફોર્મેટ ભૂલ (-૧ ગુણ પ્રતિ ભૂલ), અંગત/ઉગ્ર ભાષા (-૧.૫ ગુણ).
@@ -227,7 +227,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                 elif category == "પત્ર લેખન":
                     total_marks = 10
                     max_marks_allowed = 6
-                    expected_words = "આશરે ૧૦0 શબ્દો"
+                    expected_words = "આશરે ૧૦૦ શબ્દો"
                     category_rules = """
                     ✅ હકારાત્મક ગુણ: સત્તાવાર ફોર્મેટ (૩ ગુણ), સચોટ વિષયવસ્તુ/To the point (૪ ગુણ), સત્તાવાર શબ્દાવલિ (૩ ગુણ).
                     ❌ નકારાત્મક ગુણ: માળખાકીય ભૂલો (-૧ થી -૨ ગુણ), અસ્પષ્ટતા (-૧.૫ થી -૨ ગુણ), બિનઔપચારિક ભાષા (-૧ ગુણ).
@@ -235,7 +235,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                 elif category == "સંક્ષેપીકરણ":
                     total_marks = 10
                     max_marks_allowed = 5
-                    expected_words = "આપેલ ગદ્યમાંથી આશરે ૧/૩ (ત્રીજો) ભાગ"
+                    expected_words = "આપેલ ગદ્યમાંથી આશરે ૧/૩ (精度) ભાગ"
                     category_rules = """
                     ✅ હકારાત્મક ગુણ: યોગ્ય શીર્ષક (૨ ગુણ), મૂળ વિચારની જાળવણી (૩ ગુણ), મૌલિકતા/પોતાના શબ્દોમાં (૩ ગુણ), લંબાઈ અને શુદ્ધિ (૨ ગુણ).
                     ❌ નકારાત્મક ગુણ: શીર્ષકનો અભાવ (-૨ ગુણ), કોપી-પેસ્ટ (-૨ થી -૩ ગુણ), અર્થનો અનર્થ (-૧.૫ ગુણ).
@@ -250,8 +250,9 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                     ❌ નકારાત્મક ગુણ: જો જવાબ ખોટો હોય, અથવા જવાબ સાચો હોય પણ તેમાં જોડણીની સહેજ પણ ભૂલ હોય, તો સીધો ૦ (ઝીરો) ગુણ આપવો. કોઈપણ પ્રશ્નમાં અડધો (૦.૫) ગુણ આપવો જ નહીં.
                     """
 
+                # Rebranded to Gyan Live
                 prompt = f"""
-                તમે GyanLive Academy ના અત્યંત હોશિયાર, કડક અને સચોટ TAT 2026 મેઈન્સ (ગુજરાતી વર્ણનાત્મક) ના પેપર ચેકર છો. 
+                તમે Gyan Live ના અત્યંત હોશિયાર, કડક અને સચોટ TAT 2026 મેઈન્સ (ગુજરાતી વર્ણનાત્મક) ના પેપર ચેકર છો. 
                 વિદ્યાર્થીએ '{category}' વિભાગમાં '{final_question_to_check}' વિષય પર જવાબ લખ્યો છે.
                 
                 તમારો જવાબ હંમેશા આ વાક્યથી જ શરૂ કરો: "તમારા જવાબનું સચોટ અને વિસ્તૃત મૂલ્યાંકન નીચે મુજબ છે:"
@@ -311,7 +312,7 @@ if st.session_state['checking_result']:
     st.download_button(
         label="📥 રિઝલ્ટ ડાઉનલોડ કરો",
         data=report_data,
-        file_name="Gyan_Academy_Result.html",
+        file_name="Gyan_Live_Result.html",
         mime="text/html",
         use_container_width=True
     )
