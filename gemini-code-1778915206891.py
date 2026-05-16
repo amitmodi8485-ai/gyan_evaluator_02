@@ -25,23 +25,23 @@ GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSdEfCcM
 @st.cache_data(ttl=60)
 def load_questions(url):
     fallback_questions = {
-        "સંપૂર્ણ પેપર (૧૦૦ ગુણ)": ["૧. આખું TAT મેઈન્સ પેપર (તમામ પ્રશ્નો)", "મારો પોતાનો પ્રશ્ન (Custom)"],
-        "નિબંધ લેખન": ["૧. આર્ટિફિશિયલ ઇન્ટેલિજન્સ: વરદાન કે અભિશાપ?", "મારો પોતાનો પ્રશ્ન (Custom)"],
-        "ચર્ચાપત્ર": ["૧. ટ્રાફિક સમસ્યા અંગે તંત્રીને પત્ર", "મારો પોતાનો પ્રશ્ન (Custom)"],
-        "પત્ર લેખન": ["૧. અનિયમિત વીજ પુરવઠા અંગે ફરિયાદ પત્ર", "મારો પોતાનો પ્રશ્ન (Custom)"],
-        "સંક્ષેપીકરણ": ["૧. સંક્ષેપીકરણ ફકરો - ૧", "મારો પોતાનો પ્રશ્ન (Custom)"],
-        "વ્યાકરણ (૨૦ ગુણ)": ["૧. વ્યાકરણ સેટ - ૧", "મારો પોતાનો પ્રશ્ન (Custom)"]
+        "સંપૂર્ણ પેપર (૧૦૦ ગુણ)": ["૧. આખું TAT મેઈન્સ પેપર (તમામ પ્રશ્નો)", "Custom Question"],
+        "નિબંધ લેખન": ["૧. આર્ટિફિશિયલ ઇન્ટેલિજન્સ: વરદાન કે અભિશાપ?", "Custom Question"],
+        "ચર્ચાપત્ર": ["૧. ટ્રાફિક સમસ્યા અંગે તંત્રીને પત્ર", "Custom Question"],
+        "પત્ર લેખન": ["૧. અનિયમિત વીજ પુરવઠા અંગે ફરિયાદ પત્ર", "Custom Question"],
+        "સંક્ષેપીકરણ": ["૧. સંક્ષેપીકરણ ફકરો - ૧", "Custom Question"],
+        "વ્યાકરણ (૨૦ ગુણ)": ["૧. વ્યાકરણ સેટ - ૧", "Custom Question"]
     }
     try:
         df = pd.read_csv(url)
-        q_dict = {"સંપૂર્ણ પેપર (૧૦૦ ગુણ)": ["૧. આખું TAT મેઈન્સ પેપર (તમામ પ્રશ્નો)", "મારો પોતાનો પ્રશ્ન (Custom)"]}
+        q_dict = {"સંપૂર્ણ પેપર (૧૦૦ ગુણ)": ["૧. આખું TAT મેઈન્સ પેપર (તમામ પ્રશ્નો)", "Custom Question"]}
         for col in df.columns:
             cat = str(col).strip()
             questions = df[col].dropna().astype(str).str.strip().tolist()
-            numbered_questions = [f"{i+1}. {q}" if q != "મારો પોતાનો પ્રશ્ન (Custom)" else q for i, q in enumerate(questions)]
+            numbered_questions = [f"{i+1}. {q}" if q != "Custom Question" else q for i, q in enumerate(questions)]
             q_dict[cat] = numbered_questions
         for cat in q_dict:
-            if "મારો પોતાનો પ્રશ્ન (Custom)" not in q_dict[cat]: q_dict[cat].append("મારો પોતાનો પ્રશ્ન (Custom)")
+            if "Custom Question" not in q_dict[cat]: q_dict[cat].append("Custom Question")
         return q_dict
     except: return fallback_questions
 
@@ -155,7 +155,7 @@ st.markdown("<div class='tat-title'>🎓 Gyan Academy - TAT પેપર ચે�
 category = st.selectbox("વિભાગ:", list(questions_dict.keys()))
 selected_display = st.selectbox("વિષય/પ્રશ્ન પસંદ કરો:", questions_dict[category])
 
-actual_q = re.sub(r'^\d+\. ', '', selected_display) if selected_display != "મારો પોતાનો પ્રશ્ન (Custom)" else ""
+actual_q = re.sub(r'^\d+\. ', '', selected_display) if selected_display != "Custom Question" else ""
 if actual_q: 
     st.markdown(f"<div class='question-box'><strong>પસંદ કરેલ પ્રશ્ન:</strong><br>{actual_q}</div>", unsafe_allow_html=True)
     
@@ -181,7 +181,7 @@ if st.button("પેપર ચેક કરો 🚀", type="primary", use_contai
                     ૪. ચર્ચાપત્ર (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૨૦૦ શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૨), તટસ્થ રજૂઆત(૩), સૂચનો(૩), ભાષા(૨). નકારાત્મક: ફોર્મેટ ભૂલ(-૧ પ્રતિ ભૂલ).
                     ૫. વ્યાકરણ (૨૦ પ્રશ્નો, ૨૦ ગુણ): ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે. દરેક સાચા જવાબનો ૧ ગુણ, સહેજ પણ ભૂલ હોય તો સીધો ૦ ગુણ.
                     """
-                elif category == "નિબંધ લેખન":
+                elif category == "નિ निबंध લેખન":
                     total_marks = 20
                     max_marks_allowed = 14
                     expected_words = "આશરે ૨૫૦ થી ૩૦૦ શબ્દો"
@@ -216,7 +216,7 @@ if st.button("પેપર ચેક કરો 🚀", type="primary", use_contai
                 else: # વ્યાકરણ
                     total_marks = 20
                     max_marks_allowed = 20
-                    expected_words = "शબ્દમર્યાદા લાગુ પડતી નથી (૨૦ પ્રશ્નોના ટૂંકા જવાબો)"
+                    expected_words = "શબ્દમર્યાદા લાગુ પડતી નથી (૨૦ પ્રશ્નોના ટૂંકા જવાબો)"
                     category_rules = """
                     ✅ નિયમ: વ્યાકરણના ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે, એમ કુલ ૨૦ પ્રશ્નો હશે. દરેક પ્રશ્નનો ૧ ગુણ છે. (કુલ ૨૦ ગુણ).
                     ✅ હકારાત્મક ગુણ: જો જવાબ વ્યાકરણની દૃષ્ટિએ અને જોડણીની દૃષ્ટિએ સંપૂર્ણ સાચો હોય તો પૂરો ૧ ગુણ આપવો.
