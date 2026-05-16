@@ -4,6 +4,8 @@ from PIL import Image
 import pandas as pd
 from google import genai
 from google.genai import types
+import base64
+import os
 
 # -----------------------------------------------------
 # ૧. પેજ સેટિંગ
@@ -18,7 +20,7 @@ client = genai.Client(api_key=API_KEY)
 BEST_MODEL = "gemini-flash-latest" 
 
 # -----------------------------------------------------
-# ૩. પ્રશ્નો લોડ કરવા (તમારી નવી ગુગલ શીટની લિંક અહીં સેટ કરી છે)
+# ૩. પ્રશ્નો લોડ કરવા 
 # -----------------------------------------------------
 GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?output=csv" 
 
@@ -52,49 +54,59 @@ questions_dict = load_questions(GOOGLE_SHEET_CSV_URL)
 # -----------------------------------------------------
 if 'checking_result' not in st.session_state: st.session_state['checking_result'] = None
 
+# લોગો ફાઇલ રીડ કરવા માટેનું હેલ્પર ફંક્શન
+def get_base64_image(image_path):
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    return ""
+
+# ગિટહબ રેપોમાંથી "GYAN LIVE.png" લોડ કરવાનો પ્રયાસ
+logo_base64 = get_base64_image("GYAN LIVE.png")
+
 # -----------------------------------------------------
 # પ્રીમિયમ ગ્રે થીમ અને લાર્જ ફોન્ટ ઈન્ટરફેસ (CSS)
 # -----------------------------------------------------
-st.markdown("""
+st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Mukta+Vaani:wght@400;600;700;800&display=swap'); 
     
     /* Global Typography */
-    * { 
+    * {{ 
         font-family: 'Inter', 'Mukta Vaani', sans-serif !important; 
         font-size: 17px !important;
-    }
+    }}
     
     /* App Base Layout - Charcoal Grey Palette */
-    .stApp {
+    .stApp {{
         background-color: #1e2026;
         color: #e3e4e8;
-    }
+    }}
     
     /* Headings adjustments */
-    .tat-title { 
+    .tat-title {{ 
         color: #f1f2f5; 
         text-align: center; 
         font-size: 34px !important; 
         font-weight: 800; 
         margin-bottom: 25px;
         letter-spacing: -0.01em;
-    }
+    }}
     
     /* Form Labels sizing overrides */
-    label p {
+    label p {{
         font-size: 18px !important;
         font-weight: 600 !important;
         color: #b2b5be !important;
-    }
+    }}
     
     /* Input element text control */
-    input, select, textarea {
+    input, select, textarea {{
         font-size: 17px !important;
-    }
+    }}
     
     /* Question Box Custom Container - Slate Grey Tone */
-    .question-box { 
+    .question-box {{ 
         background-color: #262933; 
         border-left: 5px solid #707585; 
         border-top: 1px solid #383c4a;
@@ -105,18 +117,25 @@ st.markdown("""
         font-size: 19px !important; 
         color: #f1f2f5;
         margin-bottom: 20px; 
-    }
+    }}
     
     /* Structural custom borders */
-    hr {
+    hr {{
         border-color: #383c4a !important;
-    }
+    }}
     
     /* Button Text Enlargement */
-    button p {
+    button p {{
         font-size: 18px !important;
         font-weight: 600 !important;
-    }
+    }}
+    
+    /* Logo display container styling */
+    .logo-container {{
+        text-align: center;
+        margin-top: 15px;
+        margin-bottom: 10px;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -148,6 +167,14 @@ def create_html_report(text):
 # -----------------------------------------------------
 try: st.image("Seminar Uma Academy.jpg", use_container_width=True)
 except: pass
+
+# સ્ક્રીનની શરૂઆતમાં વચ્ચે લોગો બતાવવા માટેનું લોજિક
+if logo_base64:
+    st.markdown(f"""
+    <div class="logo-container">
+        <img src="data:image/png;base64,{logo_base64}" width="180" style="border-radius: 10px;">
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("<div class='tat-title'>GyanLive Evaluator-TAT Descriptive</div>", unsafe_allow_html=True)
 
@@ -237,7 +264,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                 {category_rules}
 
                 ⚠️ ભાષા, મૌલિકતા અને નકારાત્મક માર્કિંગ (Negative Marking):
-                - અંગ્રેજી શબ્દોનો નિષેધ: લખાણમાં અંગ્રેજી મૂળાક્ષરો (A-Z) નો પ્રયોગ સદંતર ટાળવો. જો એવો કોઈ શબ્દ હોય જેનું ગુજરાતી શક્ય જ ન હોય, તો તેનો ઉચ્ચાર ફરજિયાત ગુજરાતી લિપિમાં જ લખેલો હોવો જોઈએ (દા.ત. ઇન્ટરનેટ). જો લખાણમાં અંગ્રેજી અક્ષરો દેખાય તો માર્ક કાપવા અને સલાહમાં ટકોર કરવી.
+                - અંગ્રેજી શબ્દોનો નિષેધ: લખાણમાં અંગ્રેજી મૂળાક્ષરો (A-Z) નો પ્રયોગ સદંતર ટાળવો. જો એવો કોઈ શબ્દ હોય જેનું ગુજરાતી શક્ય જ ન હોય, તો તેનો ઉચ્ચાર ફરજિયાત ગુજરાતી લિપિમાં જ લખેલો હોવો જોઈએ (દા.ત. ઇન્ટરનેટ). જો લખાણમાં અંગ્રેજી અક્ષરો દેખાય તો માર્ક કાપવા and સલાહમાં ટકોર કરવી.
                 - મૌલિકતા: ગોખેલું કે ચીલાચાલુ લખાણ હોય તો માર્ક કાપવા, લખાણ મૌલિક અને હકારાત્મક હોવું જોઈએ.
                 - દર ૩ જોડણી કે વાક્યરચનાની ભૂલ પર -૦.૫ ગુણ કાપવા.
                 - પત્ર/ચર્ચાપત્રમાં જો વિદ્યાર્થીએ સાચું નામ (દા.ત. ધવલ, પટેલ, વિસનગર) લખ્યું હોય તો ઓળખ છતી કરવા બદલ સીધા -૨ ગુણ કાપવા.
@@ -260,7 +287,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                 (અહીં અત્યંત ડીપમાં માર્ગદર્શન આપો. 
                 ફરજિયાત આ વાક્યનો પ્રયોગ કરો: "જો તમે આવું લખ્યું હોત અને આ [X, Y, Z ચોક્કસ મુદ્દાઓ અને વિષયવસ્તુ] ઉમેર્યા હોત, તો તમારા માર્ક ચોક્કસ વધારે આવત." 
                 વિદ્યાર્થીને સચોટ ટોપિક્સ આપો કે त्याने પોતાના જવાબમાં કઈ માહિતી લેવી જોઈતી હતી. 
-                સંદર્ભ માટે માત્ર અને માત્ર સરકારી પ્રમાણભૂત સ્ત્રોતો જેવા કે: ગુજરાત પાક્ષિક, GCERT ના પુસ્તકો, ભાષા નિયામકની કચેરીના પ્રકાશનો, અને જીવન શિક્ષણ મેગેઝીન જ સૂવવવા.)
+                સંદર્ભ માટે માત્ર અને માત્ર સરકારી પ્રમાણભૂત સ્ત્રોતો જેવા કે: ગુજરાત પાક્ષિક, GCERT ના પુસ્તકો, ભાષા નિયામકની કચેરીના પ્રકાશનો, અને જીવન શિક્ષણ મેગેઝીન જ સૂચવવા.)
                 """
                 
                 contents = [prompt]
