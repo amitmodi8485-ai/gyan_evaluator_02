@@ -22,7 +22,7 @@ BEST_MODEL = "gemini-2.5-flash"  # મોડેલ ૨.૫ ફ્લેશ ક�
 # -----------------------------------------------------
 # ૩. પ્રશ્નો લોડ કરવા 
 # -----------------------------------------------------
-GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSb-F79599XF_5vjBv_Wb9Y-vM6MhEAtHj6R7fB-cWreKAnUo0VwNEX9tIeXJ9Wq0_kUds-Z1V9oX8z/pub?output=csv" 
+GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?output=csv" 
 
 @st.cache_data(ttl=60)
 def load_questions(url):
