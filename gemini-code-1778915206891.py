@@ -51,19 +51,6 @@ questions_dict = load_questions(GOOGLE_SHEET_CSV_URL)
 # ૪. સ્ટેટ મેનેજમેન્ટ
 # -----------------------------------------------------
 if 'checking_result' not in st.session_state: st.session_state['checking_result'] = None
-if 'mobile_no' not in st.session_state: st.session_state['mobile_no'] = "9999999999" 
-
-st.session_state['logged_in'] = True
-
-if 'user_name' not in st.session_state: st.session_state['user_name'] = ""
-if 'user_village' not in st.session_state: st.session_state['user_village'] = ""
-
-if st.query_params.get('mobile'):
-    st.session_state['mobile_no'] = st.query_params.get('mobile')
-if st.query_params.get('name'):
-    st.session_state['user_name'] = st.query_params.get('name')
-if st.query_params.get('village'):
-    st.session_state['user_village'] = st.query_params.get('village')
 
 # -----------------------------------------------------
 # પ્રીમિયમ ગ્રે થીમ અને લાર્જ ફોન્ટ ઈન્ટરફેસ (CSS)
@@ -72,7 +59,7 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Mukta+Vaani:wght@400;600;700;800&display=swap'); 
     
-    /* Global Typography - Made larger and cleaner */
+    /* Global Typography */
     * { 
         font-family: 'Inter', 'Mukta Vaani', sans-serif !important; 
         font-size: 17px !important;
@@ -136,12 +123,12 @@ st.markdown("""
 # -----------------------------------------------------
 # ૫. HTML રિપોર્ટ બનાવવાનું ફંક્શન
 # -----------------------------------------------------
-def create_html_report(text, student_name):
+def create_html_report(text):
     html_content = f"""
     <html>
     <head>
         <meta charset="utf-8">
-        <title>Gyan Academy Result - {student_name}</title>
+        <title>Gyan Academy Result</title>
         <style>
             body {{ font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; color: #111; background-color: #fff; }}
             h2 {{ color: #4f8ef7; text-align: center; border-bottom: 2px solid #4f8ef7; padding-bottom: 10px; margin-bottom: 20px; }}
@@ -149,7 +136,7 @@ def create_html_report(text, student_name):
         </style>
     </head>
     <body>
-        <h2>Gyan Academy - TAT Mains Result<br><small style="color: #555; font-size: 18px;">Student: {student_name}</small></h2>
+        <h2>Gyan Academy - TAT Mains Result</h2>
         <div class="content">{text}</div>
     </body>
     </html>
@@ -164,18 +151,6 @@ except: pass
 
 st.markdown("<div class='tat-title'>🎓 Gyan Academy - TAT પેપર ચેકિંગ</div>", unsafe_allow_html=True)
 
-# User Meta Profile Segment
-with st.container():
-    col1, col2, col3 = st.columns(3)
-    with col1: 
-        st.session_state['user_name'] = st.text_input("પૂરું નામ (English):", value=st.session_state['user_name'])
-    with col2: 
-        st.session_state['user_village'] = st.text_input("ગામ/શહેર:", value=st.session_state['user_village'])
-    with col3: 
-        st.session_state['mobile_no'] = st.text_input("મોબાઈલ નંબર:", value=st.session_state['mobile_no'])
-
-st.markdown("<hr>", unsafe_allow_html=True)
-
 # Content Configuration Segment
 category = st.selectbox("વિભાગ:", list(questions_dict.keys()))
 selected_display = st.selectbox("વિષય/પ્રશ્ન પસંદ કરો:", questions_dict[category])
@@ -189,10 +164,7 @@ final_question_to_check = actual_q if actual_q else st.text_area("તમાર�
 uploaded_files = st.file_uploader("PDF અથવા ફોટા પસંદ કરો (આખું પેપર હોય તો બધી ફાઈલો સિલેક્ટ કરો)", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
 if st.button("પેપર ચેક કરો 🚀", type="primary", use_container_width=True):
-    has_patel = "PATEL" in st.session_state['user_name'].upper()
-    if not st.session_state['user_name'] or not has_patel:
-        st.error("❌ આ પોર્ટલ માત્ર 'પાટીદાર' વિદ્યાર્થીઓ માટે છે.")
-    elif not uploaded_files:
+    if not uploaded_files:
         st.warning("⚠️ ફાઈલ અપલોડ કરો.")
     else:
         with st.spinner("⏳ પેપરનું ડીપ ચેકિંગ ચાલુ છે..."):
@@ -244,9 +216,9 @@ if st.button("પેપર ચેક કરો 🚀", type="primary", use_contai
                 else: # વ્યાકરણ
                     total_marks = 20
                     max_marks_allowed = 20
-                    expected_words = "શબ્દમર્યાદા લાગુ પડતી નથી (૨૦ પ્રશ્નોના ટૂંકા જવાબો)"
+                    expected_words = "शબ્દમર્યાદા લાગુ પડતી નથી (૨૦ પ્રશ્નોના ટૂંકા જવાબો)"
                     category_rules = """
-                    ✅ નિયમ: વ્યાકરણના ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે, એમ કુલ ૨ો પ્રશ્નો હશે. દરેક પ્રશ્નનો ૧ ગુણ છે. (કુલ ૨૦ ગુણ).
+                    ✅ નિયમ: વ્યાકરણના ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે, એમ કુલ ૨૦ પ્રશ્નો હશે. દરેક પ્રશ્નનો ૧ ગુણ છે. (કુલ ૨૦ ગુણ).
                     ✅ હકારાત્મક ગુણ: જો જવાબ વ્યાકરણની દૃષ્ટિએ અને જોડણીની દૃષ્ટિએ સંપૂર્ણ સાચો હોય તો પૂરો ૧ ગુણ આપવો.
                     ❌ નકારાત્મક ગુણ: જો જવાબ ખોટો હોય, અથવા જવાબ સાચો હોય પણ તેમાં જોડણીની સહેજ પણ ભૂલ હોય, તો સીધો ૦ (ઝીરો) ગુણ આપવો. કોઈપણ પ્રશ્નમાં અડધો (૦.૫) ગુણ આપવો જ નહીં.
                     """
@@ -308,11 +280,11 @@ if st.session_state['checking_result']:
     st.markdown(st.session_state['checking_result'])
     
     # HTML રિપોર્ટ ડાઉનલોડ બટન
-    report_data = create_html_report(st.session_state['checking_result'], st.session_state['user_name'])
+    report_data = create_html_report(st.session_state['checking_result'])
     st.download_button(
         label="📥 રિઝલ્ટ ડાઉનલોડ કરો",
         data=report_data,
-        file_name=f"Gyan_Academy_Result_{st.session_state['user_name']}.html",
+        file_name="Gyan_Academy_Result.html",
         mime="text/html",
         use_container_width=True
     )
