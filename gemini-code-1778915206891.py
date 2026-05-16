@@ -149,7 +149,8 @@ def create_html_report(text):
 try: st.image("Seminar Uma Academy.jpg", use_container_width=True)
 except: pass
 
-st.markdown("<div class='tat-title'>🎓 Gyan Academy - TAT પેપર ચેકિંગ</div>", unsafe_allow_html=True)
+# હેડર ટાઇટલ બદલીને "GyanLive Evaluator-TAT Descriptive" કરાયું
+st.markdown("<div class='tat-title'>GyanLive Evaluator-TAT Descriptive</div>", unsafe_allow_html=True)
 
 # Content Configuration Segment
 category = st.selectbox("વિભાગ:", list(questions_dict.keys()))
@@ -163,12 +164,12 @@ final_question_to_check = actual_q if actual_q else st.text_area("તમાર�
 
 uploaded_files = st.file_uploader("PDF અથવા ફોટા પસંદ કરો (આખું પેપર હોય તો બધી ફાઈલો સિલેક્ટ કરો)", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
-# UPDATED: Button label text changed to "Evaluate 🚀"
 if st.button("Evaluate 🚀", type="primary", use_container_width=True):
     if not uploaded_files:
         st.warning("⚠️ ફાઈલ અપલોડ કરો.")
     else:
-        with st.spinner("⏳ પેપરનું ડીપ ચેકિંગ ચાલુ છે..."):
+        # લોડિંગ મેસેજ બદલીને "Working on it" કરાયો
+        with st.spinner("Working on it"):
             try:
                 if category == "સંપૂર્ણ પેપર (૧૦૦ ગુણ)":
                     total_marks = 100
@@ -180,7 +181,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                     ૨. સંક્ષેપીકરણ (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): ૧/૩ ભાગ. પ્રત્યેકમાં મહત્તમ ૫ ગુણ. હકારાત્મક: શીર્ષક(૨), મૂળ વિચાર(૩), મૌલિકતા(૩), લંબાઈ(૨). નકારાત્મક: શીર્ષક વગર(-૨), કોપી-પેસ્ટ(-૩).
                     ૩. પત્ર લેખન (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૧૦૦ શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૩), સચોટતા(૪), સત્તાવાર ભાષા(૩). નકારાત્મક: માળખાકીય ભૂલ(-૧), અસ્પષ્ટતા(-૨).
                     ૪. ચર્ચાપત્ર (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૨૦૦ શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૨), તટસ્થ રજૂઆત(૩), સૂચનો(૩), ભાષા(૨). નકારાત્મક: ફોર્મેટ ભૂલ(-૧ પ્રતિ ભૂલ).
-                    ૫. વ્યાકરણ (૨૦ પ્રશ્નો, ૨૦ ગુણ): ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે. દરેક સાચા જવાબનો ૧ ગુણ, સહેજ પણ ભૂલ હોય તો સીધો ૦ ગુણ.
+                    ૫. વ્યાકરણ (૨૦ પ્રશ્નો, ૨૦ ગુણ): ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છんだ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે. દરેક સાચા જવાબનો ૧ ગુણ, સહેજ પણ ભૂલ હોય તો સીધો ૦ ગુણ.
                     """
                 elif category == "નિબંધ લેખન":
                     total_marks = 20
@@ -224,7 +225,6 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                     ❌ નકારાત્મક ગુણ: જો જવાબ ખોટો હોય, અથવા જવાબ સાચો હોય પણ તેમાં જોડણીની સહેજ પણ ભૂલ હોય, તો સીધો ૦ (ઝીરો) ગુણ આપવો. કોઈપણ પ્રશ્નમાં અડધો (૦.૫) ગુણ આપવો જ નહીં.
                     """
 
-                # UPDATED: Removed slogan text prompt initialization rule requirement block completely
                 prompt = f"""
                 તમે Gyan Academy ના અત્યંત હોશિયાર, કડક અને સચોટ TAT 2026 મેઈન્સ (ગુજરાતી વર્ણનાત્મક) ના પેપર ચેકર છો. 
                 વિદ્યાર્થીએ '{category}' વિભાગમાં '{final_question_to_check}' વિષય પર જવાબ લખ્યો છે.
@@ -244,7 +244,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                 - દર ૩ જોડણી કે વાક્યરચનાની ભૂલ પર -૦.૫ ગુણ કાપવા.
                 - પત્ર/ચર્ચાપત્રમાં જો વિદ્યાર્થીએ સાચું નામ (દા.ત. ધવલ, પટેલ, વિસનગર) લખ્યું હોય તો ઓળખ છતી કરવા બદલ સીધા -૨ ગુણ કાપવા.
 
-                મૂલ્યાંકન નીચેના ૫ વિભાગમાં જ સુંદર રીતે આપવું:
+                મૂл્યાંકન નીચેના ૫ વિભાગમાં જ સુંદર રીતે આપવું:
 
                 ### ૧. અંદાજિત શબ્દ સંખ્યા અને એનાલિસિસ: 
                 (શબ્દો ગણીને જણાવો. શબ્દમર્યાદા જળવાઈ છે કે નહીં તેનું કડક વિશ્લેષણ કરો.)
