@@ -13,21 +13,21 @@ import os
 st.set_page_config(page_title="Gyan Live - TAT Mains Evaluation", page_icon="🎓", layout="centered")
 
 # -----------------------------------------------------
-# ૨. API Key અને મોડેલ
+# ૨. API Key અને મોડેલ (UPDATED: સેટ કરાયું લેટેસ્ટ મોડેલ)
 # -----------------------------------------------------
 API_KEY = st.secrets["GEMINI_API_KEY"] 
 client = genai.Client(api_key=API_KEY)
-BEST_MODEL = "gemini-flash-latest" 
+BEST_MODEL = "gemini-2.5-flash"  # મોડેલ ૨.૫ ફ્લેશ કરવાથી સ્પીડ વધશે
 
 # -----------------------------------------------------
 # ૩. પ્રશ્નો લોડ કરવા 
 # -----------------------------------------------------
-GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?output=csv" 
+GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSb-F79599XF_5vjBv_Wb9Y-vM6MhEAtHj6R7fB-cWreKAnUo0VwNEX9tIeXJ9Wq0_kUds-Z1V9oX8z/pub?output=csv" 
 
 @st.cache_data(ttl=60)
 def load_questions(url):
     fallback_questions = {
-        "સંપૂર્ણ પેપર (૧૦0 ગુણ)": ["૧. આખું TAT મેઈન્સ પેપર (તમામ પ્રશ્નો)", "Custom Question"],
+        "સંપૂર્ણ પેપર (૧૦૦ ગુણ)": ["૧. આખું TAT મેઈન્સ પેપર (તમામ પ્રશ્નો)", "Custom Question"],
         "નિબંધ લેખન": ["૧. આર્ટિફિશિયલ ઇન્ટેલિજન્સ: વરદાન કે અભિશાપ?", "Custom Question"],
         "ચર્ચાપત્ર": ["૧. ટ્રાફિક સમસ્યા અંગે તંત્રીને પત્ર", "Custom Question"],
         "પત્ર લેખન": ["૧. અનિયમિત વીજ પુરવઠા અંગે ફરિયાદ પત્ર", "Custom Question"],
@@ -54,14 +54,12 @@ questions_dict = load_questions(GOOGLE_SHEET_CSV_URL)
 # -----------------------------------------------------
 if 'checking_result' not in st.session_state: st.session_state['checking_result'] = None
 
-# લોગો ફાઇલ રીડ કરવા માટેનું હેલ્પર ફંક્શન
 def get_base64_image(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as img_file:
             return base64.b64encode(img_file.read()).decode()
     return ""
 
-# ગિટહબ રેપોમાંથી લોગો લોડ કરવાનો પ્રયાસ
 logo_base64 = get_base64_image("gyan logo.jpg")
 
 # -----------------------------------------------------
@@ -70,78 +68,18 @@ logo_base64 = get_base64_image("gyan logo.jpg")
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Mukta+Vaani:wght@400;600;700;800&display=swap'); 
-    
-    /* Global Typography */
-    * {{ 
-        font-family: 'Inter', 'Mukta Vaani', sans-serif !important; 
-        font-size: 17px !important;
-    }}
-    
-    /* App Base Layout - Charcoal Grey Palette */
-    .stApp {{
-        background-color: #1e2026;
-        color: #e3e4e8;
-    }}
-    
-    /* Headings adjustments */
-    .tat-title {{ 
-        color: #f1f2f5; 
-        text-align: center; 
-        font-size: 34px !important; 
-        font-weight: 800; 
-        margin-bottom: 25px;
-        letter-spacing: -0.01em;
-    }}
-    
-    /* Form Labels sizing overrides */
-    label p {{
-        font-size: 18px !important;
-        font-weight: 600 !important;
-        color: #b2b5be !important;
-    }}
-    
-    /* Input element text control */
-    input, select, textarea {{
-        font-size: 17px !important;
-    }}
-    
-    /* Question Box Custom Container - Slate Grey Tone */
-    .question-box {{ 
-        background-color: #262933; 
-        border-left: 5px solid #707585; 
-        border-top: 1px solid #383c4a;
-        border-right: 1px solid #383c4a;
-        border-bottom: 1px solid #383c4a;
-        padding: 20px; 
-        border-radius: 10px; 
-        font-size: 19px !important; 
-        color: #f1f2f5;
-        margin-bottom: 20px; 
-    }}
-    
-    /* Structural custom borders */
-    hr {{
-        border-color: #383c4a !important;
-    }}
-    
-    /* Button Text Enlargement */
-    button p {{
-        font-size: 18px !important;
-        font-weight: 600 !important;
-    }}
-    
-    /* Logo display container styling */
-    .logo-container {{
-        text-align: center;
-        margin-top: 15px;
-        margin-bottom: 10px;
-    }}
+    * {{ font-family: 'Inter', 'Mukta Vaani', sans-serif !important; font-size: 17px !important; }}
+    .stApp {{ background-color: #1e2026; color: #e3e4e8; }}
+    .tat-title {{ color: #f1f2f5; text-align: center; font-size: 34px !important; font-weight: 800; margin-bottom: 25px; letter-spacing: -0.01em; }}
+    label p {{ font-size: 18px !important; font-weight: 600 !important; color: #b2b5be !important; }}
+    input, select, textarea {{ font-size: 17px !important; }}
+    .question-box {{ background-color: #262933; border-left: 5px solid #707585; border-top: 1px solid #383c4a; border-right: 1px solid #383c4a; border-bottom: 1px solid #383c4a; padding: 20px; border-radius: 10px; font-size: 19px !important; color: #f1f2f5; margin-bottom: 20px; }}
+    hr {{ border-color: #383c4a !important; }}
+    button p {{ font-size: 18px !important; font-weight: 600 !important; }}
+    .logo-container {{ text-align: center; margin-top: 15px; margin-bottom: 10px; }}
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------------------------------
-# ૫. HTML રિપોર્ટ બનાવવાનું ફંક્શન
-# -----------------------------------------------------
 def create_html_report(text):
     html_content = f"""
     <html>
@@ -168,29 +106,21 @@ def create_html_report(text):
 try: st.image("Seminar Uma Academy.jpg", use_container_width=True)
 except: pass
 
-# બ્રાન્ડિંગ લોગો
 if logo_base64:
-    st.markdown(f"""
-    <div class="logo-container">
-        <img src="data:image/jpeg;base64,{logo_base64}" width="180" style="border-radius: 10px;">
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(f"""<div class="logo-container"><img src="data:image/jpeg;base64,{logo_base64}" width="180" style="border-radius: 10px;"></div>""", unsafe_allow_html=True)
 
 st.markdown("<div class='tat-title'>GyanLive Evaluator-TAT Descriptive</div>", unsafe_allow_html=True)
 
-# Content Configuration Segment
 category = st.selectbox("વિભાગ:", list(questions_dict.keys()))
 selected_display = st.selectbox("વિષય/પ્રશ્ન પસંદ કરો:", questions_dict[category])
 
 actual_q = re.sub(r'^\d+\. ', '', selected_display) if selected_display != "Custom Question" else ""
-if actual_q: 
-    st.markdown(f"<div class='question-box'><strong>પસંદ કરેલ પ્રશ્ન:</strong><br>{actual_q}</div>", unsafe_allow_html=True)
+if actual_q: st.markdown(f"<div class='question-box'><strong>પસંદ કરેલ પ્રશ્ન:</strong><br>{actual_q}</div>", unsafe_allow_html=True)
     
 final_question_to_check = actual_q if actual_q else st.text_area("તમારો પ્રશ્ન:")
 
 uploaded_files = st.file_uploader("PDF અથવા ફોટા પસંદ કરો (આખું પેપર હોય તો બધી ફાઈલો સિલેક્ટ કરો)", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
-# ADDED: Cautionary Disclaimer Note for AI Handwriting validation
 st.warning("⚠️ **Disclaimer:** This tool is using AI for evaluation and requires clear, proper handwriting for accurate factual mapping and results.")
 
 if st.button("Evaluate 🚀", type="primary", use_container_width=True):
@@ -224,7 +154,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                     max_marks_allowed = 6
                     expected_words = "આશરે ૨૦૦ શબ્દો"
                     category_rules = """
-                    ✅ હકારાત્મક ગુણ: ફોર્મેટ (કાલ્પનિક સરનામું, તંત્રીશ્રી, વિષય, સંબોધન) (૨ ગુણ), તટસ્થ રજૂઆત (૩ ગુણ), રચનાત્મક સૂચનો (૩ ગુણ), ઔપચારિક ભાષા (૨ ગુણ).
+                    ✅ હકારાત્મક ગુણ: ફોર્મેટ (કાલ્પનિક સરનામું, તંત્રીશ્રી, વિષય, સંબોધન) (૨ ગુણ), તટસ્થ રજૂઆત (૩ ગુણ), રચનાત્મક સૂચનો (૩ ગુણ), ઔપಚಾರિક ભાષા (૨ ગુણ).
                     ❌ નકારાત્મક ગુણ: ફોર્મેટ ભૂલ (-૧ ગુણ પ્રતિ ભૂલ), અંગત/ઉગ્ર ભાષા (-૧.૫ ગુણ).
                     """
                 elif category == "પત્ર લેખન":
@@ -233,7 +163,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                     expected_words = "આશરે ૧૦૦ શબ્દો"
                     category_rules = """
                     ✅ હકારાત્મક ગુણ: સત્તાવાર ફોર્મેટ (૩ ગુણ), સચોટ વિષયવસ્તુ/To the point (૪ ગુણ), સત્તાવાર શબ્દાવલિ (૩ ગુણ).
-                    ❌ નકારાત્મક ગુણ: માળખાકીય ભૂલો (-૧ થી -૨ ગુણ), અસ્પષ્ટતા (-૧.૫ થી -૨ ગુણ), બિનઔપચારિક ભાષા (-૧ ગુણ).
+                    ❌ નકારાત્મક ગુણ: માળખાકીય ભૂલો (-૧ થી -૨ ગુણ), અસ્પષ્ટતા (-૧.૫ થી -૨ ગુણ), બિનઔપಚಾರિક ભાષા (-૧ ગુણ).
                     """
                 elif category == "સંક્ષેપીકરણ":
                     total_marks = 10
@@ -243,7 +173,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                     ✅ હકારાત્મક ગુણ: યોગ્ય શીર્ષક (૨ ગુણ), મૂળ વિચારની જાળવણી (૩ ગુણ), મૌલિકતા/પોતાના શબ્દોમાં (૩ ગુણ), લંબાઈ અને શુદ્ધિ (૨ ગુણ).
                     ❌ નકારાત્મક ગુણ: શીર્ષકનો અભાવ (-૨ ગુણ), કોપી-પેસ્ટ (-૨ થી -૩ ગુણ), અર્થનો અનર્થ (-૧.૫ ગુણ).
                     """
-                else: # વ્યાકરણ
+                else: 
                     total_marks = 20
                     max_marks_allowed = 20
                     expected_words = "શબ્દમર્યાદા લાગુ પડતી નથી (૨૦ પ્રશ્નોના ટૂંકા જવાબો)"
@@ -262,7 +192,7 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                 📏 વિભાગ અને માર્કિંગના કડક નિયમો:
                 - આ પ્રશ્ન કુલ {total_marks} ગુણનો છે.
                 - શબ્દમર્યાદા: {expected_words} હોવી જોઈએ.
-                - સૌથી કડક નિયમ (આંતરિક - રિઝલ્ટમાં ન લખવો): ગમે તેટલો સારો જવાબ હોય, પણ દર્શાવેલ મહત્તમ લિમિટ ({max_marks_allowed}) થી વધુ ગુણ આપવા જ નહીં. આ લિમિટ વિદ્યાર્થીને કહેવાની નથી, રિઝલ્ટમાં ક્યાંય 'તમને મહત્તમ આટલા જ મળી શકે' એવું દર્શાવવું નહીં. માત્ર '{total_marks} માંથી મેળવેલ ગુણ' જ દર્શાવવા.
+                - સૌથી કડક નિયમ (આંતરિક - રિઝલ્ટમાં ન લખવો): ગમે તેટલો સારો જવાબ હોય, પણ દર્શાવેલ મહત્તમ લિમિટ ({max_marks_allowed}) થી વધુ ગુણ આપવા જ નહીં. માત્ર '{total_marks} માંથી મેળવેલ ગુણ' જ દર્શાવવા.
 
                 {category_rules}
 
@@ -273,24 +203,11 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                 - પત્ર/ચર્ચાપત્રમાં જો વિદ્યાર્થીએ સાચું નામ (દા.ત. ધવલ, પટેલ, વિસનગર) લખ્યું હોય તો ઓળખ છતી કરવા બદલ સીધા -૨ ગુણ કાપવા.
 
                 મૂલ્યાંકન નીચેના ૫ વિભાગમાં જ સુંદર રીતે આપવું:
-
                 ### ૧. અંદાજિત શબ્દ સંખ્યા અને એનાલિસિસ: 
-                (શબ્દો ગણીને જણાવો. શબ્દમર્યાદા જળવાઈ છે કે નહીં તેનું કડક વિશ્લેષણ કરો.)
-
                 ### ૨. ક્યાં માર્કસ કપાયા અને શા માટે? (Errors Analysis): 
-                (ઉપરના નિયમો મુજબ ક્યાં ભૂલ થઈ છે તે જણાવો. જો અંગ્રેજી શબ્દો વાપર્યા હોય કે મૌલિકતાનો અભાવ હોય તો ખાસ જણાવવું.)
-
                 ### ૩. વિભાગવાર માર્કિંગ અને મેળવેલ ગુણ (Out of {total_marks}): 
-                (એક સુંદર ટેબલ બનાવો. તેમાં માત્ર 'કુલ ગુણ' અને 'મેળવેલ ગુણ' જ દર્શાવવા. 'મહત્તમ આપી શકાય તેવા ગુણ' એવો કોઈ ઉલ્લેખ ભૂલથી પણ કરવો નહીં. સંપૂર્ણ પેપર હોય તો 100 ગુણની માર્કશીટ બનાવવી.)
-
-                ### ૪. ભૂલોનું લિસ્ટ (સચોટ充કિંગ): 
-                (જોડણી, વાક્યરચના, વિરામચિહ્નો, અંગ્રેજી શબ્દો અને ફોર્મેટની તમામ ભૂલો અહીં પોઈન્ટ્સમાં દર્શાવો.)
-
+                ### ૪. ભૂલોનું લિસ્ટ (સચોટ ચેકિંગ): 
                 ### ૫. વિસ્તૃત સલાહ અને માર્ગદર્શન (Expert Advice): 
-                (અહીં અત્યંત ડીપમાં માર્ગદર્શન આપો. 
-                ફરજિયાત આ વાક્યનો પ્રયોગ કરો: "જો તમે આવું લખ્યું હોત અને આ [X, Y, Z ચોક્કસ મુદ્દાઓ અને વિષયવસ્તુ] ઉમેર્યા હોત, તો તમારા માર્ક ચોક્કસ વધારે આવત." 
-                વિદ્યાર્થીને સચોટ ટોપિક્સ આપો કે त्याने પોતાના જવાબમાં કઈ માહિતી લેવી જોઈતી હતી. 
-                સંદર્ભ માટે માત્ર અને માત્ર સરકારી પ્રમાણભૂત સ્ત્રોતો જેવા કે: ગુજરાત પાક્ષિક, GCERT ના પુસ્તકો, ભાષા નિયામકની કચેરીના પ્રકાશનો, અને જીવન શિક્ષણ મેગેઝીન જ સૂચવવા.)
                 """
                 
                 contents = [prompt]
@@ -303,13 +220,11 @@ if st.button("Evaluate 🚀", type="primary", use_container_width=True):
                 st.rerun()
             except Exception as e: st.error(f"❌ ભૂલ: {e}")
 
-# રિઝલ્ટ અને ડાઉનલોડ બટન
 if st.session_state['checking_result']:
     st.markdown("<hr>", unsafe_allow_html=True)
     st.success("✅ ચેકિંગ પૂર્ણ!")
     st.markdown(st.session_state['checking_result'])
     
-    # HTML રિપોર્ટ ડાઉનલોડ બટન
     report_data = create_html_report(st.session_state['checking_result'])
     st.download_button(
         label="📥 રિઝલ્ટ ડાઉનલોડ કરો",
