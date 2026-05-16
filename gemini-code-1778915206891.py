@@ -4,6 +4,8 @@ from PIL import Image
 import pandas as pd
 from google import genai
 from google.genai import types
+import base64
+import os
 
 # -----------------------------------------------------
 # ૧. પેજ સેટિંગ
@@ -30,7 +32,7 @@ def load_questions(url):
         "ચર્ચાપત્ર": ["૧. ટ્રાફિક સમસ્યા અંગે તંત્રીને પત્ર", "Custom Question"],
         "પત્ર લેખન": ["૧. અનિયમિત વીજ પુરવઠા અંગે ફરિયાદ પત્ર", "Custom Question"],
         "સંક્ષેપીકરણ": ["૧. સંક્ષેપીકરણ ફકરો - ૧", "Custom Question"],
-        "વ્યાકરણ (૨૦ ગુણ)": ["૧. વ્યાકરણ સેટ - ૧", "Custom Question"]
+        "વ્યાકરણ (૨0 ગુણ)": ["૧. વ્યાકરણ સેટ - ૧", "Custom Question"]
     }
     try:
         df = pd.read_csv(url)
@@ -53,48 +55,80 @@ questions_dict = load_questions(GOOGLE_SHEET_CSV_URL)
 if 'checking_result' not in st.session_state: st.session_state['checking_result'] = None
 
 # -----------------------------------------------------
-# પ્રીમિયમ ગ્રે થીમ અને લાર્જ ફોન્ટ ઈન્ટરફેસ (CSS)
+# લોગો લોડ કરવા માટેનું બેઝ હેલ્પર ફંક્શન
 # -----------------------------------------------------
-st.markdown("""
+def get_base64_image(image_path):
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    return ""
+
+# ગિટહબ રેપોમાંથી "GYAN LIVE.png" રીડ કરવાનો પ્રયાસ
+logo_base64 = get_base64_image("GYAN LIVE.png")
+
+# -----------------------------------------------------
+# પ્રીમિયમ ગ્રે થીમ, વોટરમાર્ક લોગો અને લાર્જ ફોન્ટ ઈન્ટરફેસ (CSS)
+# -----------------------------------------------------
+background_css = ""
+if logo_base64:
+    # Adding logo as a subtle faded background watermark
+    background_css = f"""
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: url("data:image/png;base64,{logo_base64}");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 40%;
+        opacity: 0.04;  /* 控制背景图片的透明度，使其不干扰文字 */
+        pointer-events: none;
+        z-index: -1;
+    }}
+    """
+
+st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Mukta+Vaani:wght@400;600;700;800&display=swap'); 
     
     /* Global Typography */
-    * { 
+    * {{ 
         font-family: 'Inter', 'Mukta Vaani', sans-serif !important; 
         font-size: 17px !important;
-    }
+    }}
     
     /* App Base Layout - Charcoal Grey Palette */
-    .stApp {
+    .stApp {{
         background-color: #1e2026;
         color: #e3e4e8;
-    }
+    }}
+    
+    {background_css}
     
     /* Headings adjustments */
-    .tat-title { 
+    .tat-title {{ 
         color: #f1f2f5; 
         text-align: center; 
         font-size: 34px !important; 
         font-weight: 800; 
         margin-bottom: 25px;
         letter-spacing: -0.01em;
-    }
+    }}
     
     /* Form Labels sizing overrides */
-    label p {
+    label p {{
         font-size: 18px !important;
         font-weight: 600 !important;
         color: #b2b5be !important;
-    }
+    }}
     
     /* Input element text control */
-    input, select, textarea {
+    input, select, textarea {{
         font-size: 17px !important;
-    }
+    }}
     
     /* Question Box Custom Container - Slate Grey Tone */
-    .question-box { 
+    .question-box {{ 
         background-color: #262933; 
         border-left: 5px solid #707585; 
         border-top: 1px solid #383c4a;
@@ -105,49 +139,40 @@ st.markdown("""
         font-size: 19px !important; 
         color: #f1f2f5;
         margin-bottom: 20px; 
-    }
+    }}
     
     /* Structural custom borders */
-    hr {
+    hr {{
         border-color: #383c4a !important;
-    }
+    }}
     
     /* Button Text Enlargement */
-    button p {
+    button p {{
         font-size: 18px !important;
         font-weight: 600 !important;
-    }
+    }}
+    
+    /* Brand Header Logo Style */
+    .brand-logo-container {{
+        text-align: center;
+        margin-bottom: 10px;
+    }}
 </style>
 """, unsafe_allow_html=True)
-
-# -----------------------------------------------------
-# ૫. HTML રિપોર્ટ બનાવવાનું ફંક્શન
-# -----------------------------------------------------
-def create_html_report(text):
-    html_content = f"""
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Gyan Academy Result</title>
-        <style>
-            body {{ font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; color: #111; background-color: #fff; }}
-            h2 {{ color: #4f8ef7; text-align: center; border-bottom: 2px solid #4f8ef7; padding-bottom: 10px; margin-bottom: 20px; }}
-            .content {{ white-space: pre-wrap; font-size: 16px; }}
-        </style>
-    </head>
-    <body>
-        <h2>Gyan Academy - TAT Mains Result</h2>
-        <div class="content">{text}</div>
-    </body>
-    </html>
-    """
-    return html_content.encode('utf-8')
 
 # -----------------------------------------------------
 # ૬. મુખ્ય પોર્ટલ ડેશબોર્ડ
 # -----------------------------------------------------
 try: st.image("Seminar Uma Academy.jpg", use_container_width=True)
 except: pass
+
+# Display main branding logo directly at the top header area if available
+if logo_base64:
+    st.markdown(f"""
+    <div class="brand-logo-container">
+        <img src="data:image/png;base64,{logo_base64}" width="160" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("<div class='tat-title'>🎓 Gyan Academy - TAT પેપર ચેકિંગ</div>", unsafe_allow_html=True)
 
@@ -178,10 +203,10 @@ if st.button("પેપર ચેક કરો 🚀", type="primary", use_contai
                     ૧. નિબંધ (૨૦ ગુણ): આશરે ૨૫૦ થી ૩૦૦ શબ્દો. મહત્તમ ૧૪ ગુણ. હકારાત્મક: પ્રસ્તાવના(૪), વિષયવસ્તુ(૮), મૌલિકતા(૪), ભાષા(૪). નકારાત્મક: વિષયાંતર(-૩ થી -૫), શબ્દમર્યાદા ભંગ(-૧ થી -૨).
                     ૨. સંક્ષેપીકરણ (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): ૧/૩ ભાગ. પ્રત્યેકમાં મહત્તમ ૫ ગુણ. હકારાત્મક: શીર્ષક(૨), મૂળ વિચાર(૩), મૌલિકતા(૩), લંબાઈ(૨). નકારાત્મક: શીર્ષક વગર(-૨), કોપી-પેસ્ટ(-૩).
                     ૩. પત્ર લેખન (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૧૦૦ શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૩), સચોટતા(૪), સત્તાવાર ભાષા(૩). નકારાત્મક: માળખાકીય ભૂલ(-૧), અસ્પષ્ટતા(-૨).
-                    ૪. ચર્ચાપત્ર (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૨૦૦ શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૨), તટસ્થ રજૂઆત(૩), સૂચનો(૩), ભાષા(૨). નકારાત્મક: ફોર્મેટ ભૂલ(-૧ પ્રતિ ભૂલ).
+                    ૪. ચર્ચાપત્ર (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૨૦0 શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૨), તટસ્થ રજૂઆત(૩), સૂચનો(૩), ભાષા(૨). નકારાત્મક: ફોર્મેટ ભૂલ(-૧ પ્રતિ ભૂલ).
                     ૫. વ્યાકરણ (૨૦ પ્રશ્નો, ૨૦ ગુણ): ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે. દરેક સાચા જવાબનો ૧ ગુણ, સહેજ પણ ભૂલ હોય તો સીધો ૦ ગુણ.
                     """
-                elif category == "નિ निबंध લેખન":
+                elif category == "નિબંધ લેખન":
                     total_marks = 20
                     max_marks_allowed = 14
                     expected_words = "આશરે ૨૫૦ થી ૩૦૦ શબ્દો"
