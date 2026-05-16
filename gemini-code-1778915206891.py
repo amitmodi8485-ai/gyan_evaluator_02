@@ -48,12 +48,11 @@ def load_questions(url):
 questions_dict = load_questions(GOOGLE_SHEET_CSV_URL)
 
 # -----------------------------------------------------
-# ૪. સ્ટેટ મેનેજમેન્ટ (Login Interface Required Set to False Automatically)
+# ૪. સ્ટેટ મેનેજમેન્ટ
 # -----------------------------------------------------
 if 'checking_result' not in st.session_state: st.session_state['checking_result'] = None
-if 'mobile_no' not in st.session_state: st.session_state['mobile_no'] = "9999999999" # Default temporary mobile bypass
+if 'mobile_no' not in st.session_state: st.session_state['mobile_no'] = "9999999999" 
 
-# We force logged_in to be True from the start
 st.session_state['logged_in'] = True
 
 if 'user_name' not in st.session_state: st.session_state['user_name'] = ""
@@ -67,45 +66,69 @@ if st.query_params.get('village'):
     st.session_state['user_village'] = st.query_params.get('village')
 
 # -----------------------------------------------------
-# પ્રીમિયમ ડાર્ક થીમ CSS ઈન્ટરફેસ
+# પ્રીમિયમ ગ્રે થીમ અને લાર્જ ફોન્ટ ઈન્ટરફેસ (CSS)
 # -----------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Mukta+Vaani:wght@400;600;700;800&display=swap'); 
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Mukta+Vaani:wght@400;600;700;800&display=swap'); 
     
+    /* Global Typography - Made larger and cleaner */
     * { 
-        font-family: 'Mukta Vaani', sans-serif !important; 
+        font-family: 'Inter', 'Mukta Vaani', sans-serif !important; 
+        font-size: 17px !important;
     }
     
+    /* App Base Layout - Charcoal Grey Palette */
     .stApp {
-        background-color: #0f1117;
-        color: #e8eaf0;
+        background-color: #1e2026;
+        color: #e3e4e8;
     }
     
+    /* Headings adjustments */
     .tat-title { 
-        color: #4f8ef7; 
+        color: #f1f2f5; 
         text-align: center; 
-        font-size: 32px; 
+        font-size: 34px !important; 
         font-weight: 800; 
         margin-bottom: 25px;
         letter-spacing: -0.01em;
     }
     
+    /* Form Labels sizing overrides */
+    label p {
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: #b2b5be !important;
+    }
+    
+    /* Input element text control */
+    input, select, textarea {
+        font-size: 17px !important;
+    }
+    
+    /* Question Box Custom Container - Slate Grey Tone */
     .question-box { 
-        background-color: #181c27; 
-        border-left: 5px solid #4f8ef7; 
-        border-top: 1px solid #2a3045;
-        border-right: 1px solid #2a3045;
-        border-bottom: 1px solid #2a3045;
-        padding: 18px; 
+        background-color: #262933; 
+        border-left: 5px solid #707585; 
+        border-top: 1px solid #383c4a;
+        border-right: 1px solid #383c4a;
+        border-bottom: 1px solid #383c4a;
+        padding: 20px; 
         border-radius: 10px; 
-        font-size: 18px; 
-        color: #e8eaf0;
+        font-size: 19px !important; 
+        color: #f1f2f5;
         margin-bottom: 20px; 
     }
     
+    /* Structural custom borders */
     hr {
-        border-color: #2a3045 !important;
+        border-color: #383c4a !important;
+    }
+    
+    /* Button Text Enlargement */
+    button p {
+        font-size: 18px !important;
+        font-weight: 600 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -134,7 +157,7 @@ def create_html_report(text, student_name):
     return html_content.encode('utf-8')
 
 # -----------------------------------------------------
-# ૬. મુખ્ય પોર્ટલ ડેશબોર્ડ (No login view displayed anymore)
+# ૬. મુખ્ય પોર્ટલ ડેશબોર્ડ
 # -----------------------------------------------------
 try: st.image("Seminar Uma Academy.jpg", use_container_width=True)
 except: pass
@@ -180,7 +203,7 @@ if st.button("પેપર ચેક કરો 🚀", type="primary", use_contai
                     expected_words = "દરેક વિભાગની માંગ મુજબ"
                     category_rules = """
                     ✅ **ખાસ સૂચના (સંપૂર્ણ પેપર માટે):** વિદ્યાર્થીએ આખું 100 માર્કનું પેપર અપલોડ કર્યું છે. દરેક પ્રશ્નનું અલગ-અલગ મૂલ્યાંકન નીચે મુજબના કડક માપદંદોથી કરવું:
-                    ૧. નિબંધ (૨૦ ગુણ): આશરે ૨૫૦ થી ૩૦૦ શબ્દો. મહત્તમ ૧૪ ગુણ. હકારาત્મક: પ્રસ્તાવના(૪), વિષયવસ્તુ(૮), મૌલિકતા(૪), ભાષા(૪). નકારાત્મક: વિષયાંતર(-૩ થી -૫), શબ્દમર્યાદા ભંગ(-૧ થી -૨).
+                    ૧. નિબંધ (૨૦ ગુણ): આશરે ૨૫૦ થી ૩૦૦ શબ્દો. મહત્તમ ૧૪ ગુણ. હકારાત્મક: પ્રસ્તાવના(૪), વિષયવસ્તુ(૮), મૌલિકતા(૪), ભાષા(૪). નકારાત્મક: વિષયાંતર(-૩ થી -૫), શબ્દમર્યાદા ભંગ(-૧ થી -૨).
                     ૨. સંક્ષેપીકરણ (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): ૧/૩ ભાગ. પ્રત્યેકમાં મહત્તમ ૫ ગુણ. હકારાત્મક: શીર્ષક(૨), મૂળ વિચાર(૩), મૌલિકતા(૩), લંબાઈ(૨). નકારાત્મક: શીર્ષક વગર(-૨), કોપી-પેસ્ટ(-૩).
                     ૩. પત્ર લેખન (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૧૦૦ શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૩), સચોટતા(૪), સત્તાવાર ભાષા(૩). નકારાત્મક: માળખાકીય ભૂલ(-૧), અસ્પષ્ટતા(-૨).
                     ૪. ચર્ચાપત્ર (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૨૦૦ શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૨), તટસ્થ રજૂઆત(૩), સૂચનો(૩), ભાષા(૨). નકારાત્મક: ફોર્મેટ ભૂલ(-૧ પ્રતિ ભૂલ).
@@ -223,7 +246,7 @@ if st.button("પેપર ચેક કરો 🚀", type="primary", use_contai
                     max_marks_allowed = 20
                     expected_words = "શબ્દમર્યાદા લાગુ પડતી નથી (૨૦ પ્રશ્નોના ટૂંકા જવાબો)"
                     category_rules = """
-                    ✅ નિયમ: વ્યાકરણના ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે, એમ કુલ ૨૦ પ્રશ્નો હશે. દરેક પ્રશ્નનો ૧ ગુણ છે. (કુલ ૨૦ ગુણ).
+                    ✅ નિયમ: વ્યાકરણના ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે, એમ કુલ ૨ો પ્રશ્નો હશે. દરેક પ્રશ્નનો ૧ ગુણ છે. (કુલ ૨૦ ગુણ).
                     ✅ હકારાત્મક ગુણ: જો જવાબ વ્યાકરણની દૃષ્ટિએ અને જોડણીની દૃષ્ટિએ સંપૂર્ણ સાચો હોય તો પૂરો ૧ ગુણ આપવો.
                     ❌ નકારાત્મક ગુણ: જો જવાબ ખોટો હોય, અથવા જવાબ સાચો હોય પણ તેમાં જોડણીની સહેજ પણ ભૂલ હોય, તો સીધો ૦ (ઝીરો) ગુણ આપવો. કોઈપણ પ્રશ્નમાં અડધો (૦.૫) ગુણ આપવો જ નહીં.
                     """
@@ -264,7 +287,7 @@ if st.button("પેપર ચેક કરો 🚀", type="primary", use_contai
                 ### ૫. વિસ્તૃત સલાહ અને માર્ગદર્શન (Expert Advice): 
                 (અહીં અત્યંત ડીપમાં માર્ગદર્શન આપો. 
                 ફરજિયાત આ વાક્યનો પ્રયોગ કરો: "જો તમે આવું લખ્યું હોત અને આ [X, Y, Z ચોક્કસ મુદ્દાઓ અને વિષયવસ્તુ] ઉમેર્યા હોત, તો તમારા માર્ક ચોક્કસ વધારે આવત." 
-                વિદ્યાર્થીને સચોટ ટોપિક્સ આપો કે તેણે પોતાના જવાબમાં કઈ માહિતી લેવી જોઈતી હતી. 
+                વિદ્યાર્થીને સચોટ ટોપિક્સ આપો કે त्याने પોતાના જવાબમાં કઈ માહિતી લેવી જોઈતી હતી. 
                 સંદર્ભ માટે માત્ર અને માત્ર સરકારી પ્રમાણભૂત સ્ત્રોતો જેવા કે: ગુજરાત પાક્ષિક, GCERT ના પુસ્તકો, ભાષા નિયામકની કચેરીના પ્રકાશનો, અને જીવન શિક્ષણ મેગેઝીન જ સૂચવવા.)
                 """
                 
