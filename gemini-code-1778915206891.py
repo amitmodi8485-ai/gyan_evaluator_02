@@ -22,7 +22,7 @@ BEST_MODEL = "gemini-2.5-flash"
 # -----------------------------------------------------
 # ૩. પ્રશ્નો અને મોબાઈલ લિસ્ટ લોડ કરવા (ગુગલ શીટ લિંક્સ)
 # -----------------------------------------------------
-GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSb-F79599XF_5vjBv_Wb9Y-vM6MhEAtHj6R7fB-cWreKAnUo0VwNEX9tIeXJ9Wq0_kUds-Z1V9oX8z/pub?output=csv" 
+GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?output=csv" 
 
 # UPDATED: લિંકની પાછળ &sheet=Sheet2 સેટ કર્યું છે જેથી કોડ સીધો Sheet2 ની કોલમ A ચેક કરશે
 AUTH_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?output=csv&sheet=Sheet2"
