@@ -6,6 +6,7 @@ from google import genai
 from google.genai import types
 import base64
 import os
+import time  # ટાઈમસ્ટેમ્પ જનરેટ કરવા માટે
 
 # -----------------------------------------------------
 # ૧. પેજ સેટિંગ
@@ -22,13 +23,16 @@ BEST_MODEL = "gemini-2.5-flash"
 # -----------------------------------------------------
 # ૩. પ્રશ્નો અને મોબાઈલ લિસ્ટ લોડ કરવા (ગુગલ શીટ લિંક્સ)
 # -----------------------------------------------------
-# Sheet1 (Questions) ની સાચી લિંક
-GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?gid=0&single=true&output=csv" 
+# Base URLs
+BASE_Q_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?gid=0&single=true&output=csv" 
+BASE_AUTH_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?gid=365490828&single=true&output=csv"
 
-# Sheet2 (Mobile Numbers) ની સાચી લિંક
-AUTH_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?gid=365490828&single=true&output=csv"
+# UPDATED: Cache બાયપાસ કરવા માટે લિંકની પાછળ દર વખતે નવો ટાઈમ પેરામીટર ઉમેરાશે
+GOOGLE_SHEET_CSV_URL = f"{BASE_Q_URL}&nocache={int(time.time())}"
+AUTH_SHEET_CSV_URL = f"{BASE_AUTH_URL}&nocache={int(time.time())}"
 
-@st.cache_data(ttl=60)
+# UPDATED: ttl ઘટાડીને ૫ સેકન્ડ કરાયું જેથી નવી રો તરત ડિસ્પ્લે થાય
+@st.cache_data(ttl=5)
 def load_questions(url):
     fallback_questions = {
         "સંપૂર્ણ પેપર (૧૦૦ ગુણ)": ["૧. આખું TAT મેઈન્સ પેપર (તમામ પ્રશ્નો)", "Custom Question"],
@@ -36,14 +40,14 @@ def load_questions(url):
         "ચર્ચાપત્ર": ["૧. ટ્રાફિક સમસ્યા અંગે તંત્રીને પત્ર", "Custom Question"],
         "પત્ર લેખન": ["૧. અનિયમિત વીજ પુરવઠા અંગે ફરિયાદ પત્ર", "Custom Question"],
         "સંક્ષેપીકરણ": ["૧. સંક્ષેપીકરણ ફકરો - ૧", "Custom Question"],
-        "ව્યાકરણ (૨૦ ગુણ)": ["૧. વ્યાકરણ સેટ - ૧", "Custom Question"]
+        "વ્યાકરણ (૨૦ ગુણ)": ["૧. વ્યાકરણ સેટ - ૧", "Custom Question"]
     }
     try:
+        # cache બસ્ટર લિંકથી ડેટા રીડ કરવો
         df = pd.read_csv(url)
         q_dict = {}
         for col in df.columns:
             cat = str(col).strip()
-            # બધી રો માંથી ડેટા ક્લીન કરીને લોડ કરવો
             questions = df[col].dropna().astype(str).str.strip().tolist()
             numbered_questions = [f"{i+1}. {q}" if q != "Custom Question" else q for i, q in enumerate(questions)]
             q_dict[cat] = numbered_questions
@@ -53,13 +57,12 @@ def load_questions(url):
     except: return fallback_questions
 
 # અધિકૃત મોબાઈલ નંબરો લોડ કરવાનું ફંક્શન
-@st.cache_data(ttl=10)
+@st.cache_data(ttl=5)
 def load_allowed_numbers(url):
     try:
         df = pd.read_csv(url)
         first_col = df.columns[0]
         numbers = df[first_col].dropna().astype(str).str.strip().tolist()
-        # ફ્લોટ પોઈન્ટ્સ (.0) હટાવવા માટેનું ક્લીનિંગ લોજિક
         cleaned_numbers = [num.split('.')[0] for num in numbers]
         return cleaned_numbers
     except:
@@ -173,7 +176,7 @@ else:
                         expected_words = "દરેક વિભાગની માંગ મુજબ"
                         category_rules = """
                         ✅ **ખાસ સૂચના (સંપૂર્ણ પેપર માટે):** વિદ્યાર્થીએ આખું 100 માર્કનું પેપર અપલોડ કર્યું છે. દરેક પ્રશ્નનું અલગ-અલગ મૂલ્યાંકન નીચે મુજબના કડક માપદંદોથી કરવું:
-                        ૧. નિબંધ (૨૦ ગુણ): આશરે ૨૫૦ થી ૩૦૦ શબ્દો. મહત્તમ ૧૪ ગુણ. હકારાત્મક: પ્રસ્તાવના(૪), વિષયવસ્તુ(૮), મૌલિકતા(૪), ભાષા(૪). નકારાત્મક: વિષયાંતર(-૩ થી -૫), શબ્દમર્યાદા ભંગ(-૧ થી -૨).
+                        ૧. નિબંધ (૨૦ ગુણ): આશરે ૨૫૦ થી ૩૦૦ શબ્દો. મહત્તમ ૧૪ ગુણ. હકારาત્મક: પ્રસ્તાવના(૪), વિષયવસ્તુ(૮), મૌલિકતા(૪), ભાષા(૪). નકારાત્મક: વિષયાંતર(-૩ થી -૫), શબ્દમર્યાદા ભંગ(-૧ થી -૨).
                         ૨. સંક્ષેપીકરણ (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): ૧/૩ ભાગ. પ્રત્યેકમાં મહત્તમ ૫ ગુણ. હકારાત્મક: શીર્ષક(૨), મૂળ વિચાર(૩), મૌલિકતા(૩), લંબાઈ(૨). નકારાત્મક: શીર્ષક વગર(-૨), કોપી-પેસ્ટ(-૩).
                         ૩. પત્ર લેખન (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૧૦૦ શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૩), સચોટતા(૪), સત્તાવાર ભાષા(૩). નકારાત્મક: માળખાકીય ભૂલ(-૧), અસ્પષ્ટતા(-૨).
                         ૪. ચર્ચાપત્ર (૨ પ્રશ્નો, કુલ ૨૦ ગુણ): દરેકના આશરે ૨૦0 શબ્દો. પ્રત્યેકમાં મહત્તમ ૬ ગુણ. હકારાત્મક: ફોર્મેટ(૨), તટસ્થ રજૂઆત(૩), સૂચનો(૩), ભાષા(૨). નકારાત્મક: ફોર્મેટ ભૂલ(-૧ પ્રતિ ભૂલ).
