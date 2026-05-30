@@ -22,7 +22,10 @@ BEST_MODEL = "gemini-2.5-flash"
 # -----------------------------------------------------
 # ૩. પ્રશ્નો અને મોબાઈલ લિસ્ટ લોડ કરવા (ગુગલ શીટ લિંક્સ)
 # -----------------------------------------------------
-GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?output=csv" 
+# Sheet1 (Questions) ની સાચી લિંક
+GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?gid=0&single=true&output=csv" 
+
+# Sheet2 (Mobile Numbers) ની સાચી લિંક
 AUTH_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWh0A_30fkGqrbeerQhZkYFJpk37jai-Xy242HLGin-OaKt8I9_2gPl2g50eSEnAsOlQ3FMEhJHyj_/pub?gid=365490828&single=true&output=csv"
 
 @st.cache_data(ttl=60)
@@ -33,13 +36,14 @@ def load_questions(url):
         "ચર્ચાપત્ર": ["૧. ટ્રાફિક સમસ્યા અંગે તંત્રીને પત્ર", "Custom Question"],
         "પત્ર લેખન": ["૧. અનિયમિત વીજ પુરવઠા અંગે ફરિયાદ પત્ર", "Custom Question"],
         "સંક્ષેપીકરણ": ["૧. સંક્ષેપીકરણ ફકરો - ૧", "Custom Question"],
-        "વ્યાકરણ (૨૦ ગુણ)": ["૧. વ્યાકરણ સેટ - ૧", "Custom Question"]
+        "ව્યાકરણ (૨૦ ગુણ)": ["૧. વ્યાકરણ સેટ - ૧", "Custom Question"]
     }
     try:
         df = pd.read_csv(url)
-        q_dict = {"સંપૂર્ણ પેપર (૧૦૦ ગુણ)": ["૧. આખું TAT મેઈન્સ પેપર (તમામ પ્રશ્નો)", "Custom Question"]}
+        q_dict = {}
         for col in df.columns:
             cat = str(col).strip()
+            # બધી રો માંથી ડેટા ક્લીન કરીને લોડ કરવો
             questions = df[col].dropna().astype(str).str.strip().tolist()
             numbered_questions = [f"{i+1}. {q}" if q != "Custom Question" else q for i, q in enumerate(questions)]
             q_dict[cat] = numbered_questions
@@ -55,6 +59,7 @@ def load_allowed_numbers(url):
         df = pd.read_csv(url)
         first_col = df.columns[0]
         numbers = df[first_col].dropna().astype(str).str.strip().tolist()
+        # ફ્લોટ પોઈન્ટ્સ (.0) હટાવવા માટેનું ક્લીનિંગ લોજિક
         cleaned_numbers = [num.split('.')[0] for num in numbers]
         return cleaned_numbers
     except:
@@ -211,7 +216,7 @@ else:
                         max_marks_allowed = 20
                         expected_words = "શબ્દમર્યાદા લાગુ પડતી નથી (૨૦ પ્રશ્નોના ટૂંકા જવાબો)"
                         category_rules = """
-                        ✅ નિયમ: વ્યાકરણના ૧ો અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે, એમ કુલ ૨૦ પ્રશ્નો હશે. દરેક પ્રશ્નનો ૧ ગુણ છે. (કુલ ૨૦ ગુણ).
+                        ✅ નિયમ: વ્યાકરણના ૧૦ અલગ-અલગ ટોપિક છે (રૂઢિપ્રયોગ, કહેવતો, સમાસ, છંદ, અલંકાર, શબ્દસમૂહ, જોડણી, લેખનશુદ્ધિ, સંધિ, વાક્ય રચના). દરેક ટોપિકમાંથી ફરજિયાત ૨ પ્રશ્નો પૂછાયા હશે, એમ કુલ ૨૦ પ્રશ્નો હશે. દરેક પ્રશ્નનો ૧ ગુણ છે. (કુલ ૨૦ ગુણ).
                         ✅ હકારાત્મક ગુણ: જો જવાબ વ્યાકરણની દૃષ્ટિએ અને જોડણીની દૃષ્ટિએ સંપૂર્ણ સાચો હોય તો પૂરો ૧ ગુણ આપવો.
                         ❌ નકારાત્મક ગુણ: જો જવાબ ખોટો હોય, અથવા જવાબ સાચો હોય પણ તેમાં જોડણીની સહેજ પણ ભૂલ હોય, તો સીધો ૦ (ઝીરો) ગુણ આપવો. કોઈપણ પ્રશ્નમાં અડધો (૦.૫) ગુણ આપવો જ નહીં.
                         """
